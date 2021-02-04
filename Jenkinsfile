@@ -6,26 +6,7 @@ pipeline {
 	    
     }
    stages {
-   	stage("SonarQube Analysis"){
-        	steps {
-                	withSonarQubeEnv("Sonarqube") {
-                    		sh "mvn -f pom.xml sonar:sonar -Dsonar.sources=src/"
-                    		script {
-		    			LAST_STARTED = env.STAGE_NAME
-					container_Up = false
-                    			timeout(time: 1, unit: "HOURS") { 
-                        			sh "curl -u admin:admin -X GET -H \"Accept: application/json\" http://104.248.169.167:9000/api/qualitygates/project_status?projectKey=com.mycompany:jenkinsprojnew > status.json"
-                        			def json = readJSON file:"status.json"
-                        			echo "${json.projectStatus}"
-                        			if ("${json.projectStatus.status}" != "OK") {
-                            				currentBuild.result = "FAILURE"
-                           				error("Pipeline aborted due to quality gate failure.")
-                           			}
-                        		}     
-                    		}
-                	}
-                }
-	}
+   	
        /*stage("upload to nexus") {
       steps {
         script {
@@ -136,7 +117,7 @@ pipeline {
 				LAST_STARTED = env.STAGE_NAME
 				configFileProvider([configFile(fileId: "706c4f0b-71dc-46f3-9542-b959e2d26ce7", variable: "settings")]){
 					
-				sh "mvn -f pom.xml -s $settings package deploy -DmuleDeploy -DskipTests -Dkey=mymulesoft -Danypoint.username=njcdemo1 -Danypoint.password=Njclabs@123 -DapplicationName=jenkinsprojnew-mule -Dcloudhub.region=us-east-2 -Danypoint.platform.client_id=2873c31e7152405e9dc38600007108e8 -Danypoint.platform.client_secret=70da4Da4228749B7A33C848E9a3C0849"
+				sh "mvn -f pom.xml -s $settings package deploy -DmuleDeploy -DskipTests -Dkey=mymulesoft -Danypoint.username=anoop-rk -Danypoint.password=Anoop^1961 -DapplicationName=jenkinsprojnew-mule -Dcloudhub.region=us-east-2 -Danypoint.platform.client_id=2873c31e7152405e9dc38600007108e8 -Danypoint.platform.client_secret=70da4Da4228749B7A33C848E9a3C0849"
 				}
 			}
              	}
