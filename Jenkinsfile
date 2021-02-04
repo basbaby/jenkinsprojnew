@@ -32,61 +32,7 @@ pipeline {
             	}    
       } 
 	   
-      stage("Build image") {
-      		steps {
-        		script {
-			  	//sh "docker stop apiops-anypoint-jenkins-sapi" 
-        		  	//sh "docker rm apiops-anypoint-jenkins-sapi"
-			   	LAST_STARTED = env.STAGE_NAME
-				container_Up = false
-			   	sh "docker build -t jenkinsprojnew:mule -f Dockerfile ."
-                	 
-                        }
-               }
-      }
-
-      stage("Run container") {
-      		steps {
-        		script {
-			     	LAST_STARTED = env.STAGE_NAME
-          		    	sh " docker run -itd -p 8082:8081 --name jenkinsprojnew jenkinsprojnew:mule"
-				container_Up = true
-				sh "sleep 60"
-       			}
-		}
-     }
-   	
-     stage ("Munit Test"){
-        	steps {
-			script {
-			   	LAST_STARTED = env.STAGE_NAME
-				configFileProvider([configFile(fileId: "706c4f0b-71dc-46f3-9542-b959e2d26ce7", variable: "settings")]){
-			   	sh "mvn -f pom.xml -Dhttp.port=8086 -s $settings -Dkey=mymulesoft test"
-				
-				publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "jenkinsprojnew/target/site/munit/coverage", reportFiles: "summary.html", reportName: "Munit coverage Report", reportTitles: ""])
-				}
-			}		
-        	}    
-     }
-     stage("Functional Testing"){
-        	steps {
-			script {
-				LAST_STARTED = env.STAGE_NAME
-				sh "mvn -f cucumber-API-Framework/pom.xml test -Dtestfile=cucumber-API-Framework/src/test/javarunner.TestRunner.java"
-				cucumber(failedFeaturesNumber: -1, failedScenariosNumber: -1, failedStepsNumber: -1, fileIncludePattern: "cucumber.json", jsonReportDirectory: "cucumber-API-Framework/target", pendingStepsNumber: -1, skippedStepsNumber: -1, sortingMethod: "ALPHABETICAL", undefinedStepsNumber: -1)
-			}
-        		
-             	}   
-     }
-	
-	  stage ("Jmeter Testing"){
-	    steps{
-		    sh "mvn -f apipos-jmeter-automation-master/pom.xml clean verify -Djmeter.path=/opt/jmeter/5.3/libexec/bin/"
-		    perfReport filterRegex: "", sourceDataFiles: "**/*.jtl"
-		    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "", reportFiles: "**/index.html", reportName: "Jmeter- performance test report", reportTitles: "Jmeter Reports"])
-	
-	    	   }
-	   }
+     
 	   
     //stage("Generate Reports") {
     //		steps {
@@ -97,19 +43,6 @@ pipeline {
  //               }
  //   }
 	   
-    stage("Archetype"){
-        	steps {
-			script {
-		    		LAST_STARTED = env.STAGE_NAME
-		    		configFileProvider([configFile(fileId: "706c4f0b-71dc-46f3-9542-b959e2d26ce7", variable: "settings")]){
-					def data = "archetype.artifactId=generic-db-sapi"
-                  		        writeFile(file: "archetype.properties", text: data)
-                    			sh "mvn -f pom.xml -s $settings archetype:create-from-project -Darchetype.properties=/var/lib/jenkins/workspace/devops-project/archetype.properties"
-		    			sh "mvn -f jenkinsprojnew/target/generated-sources/archetype/pom.xml -s $settings clean deploy -DaltSnapshotDeploymentRepository=nexus-snapshots::http://104.248.169.167:8081/repository/maven-snapshots/"
-                  		} 
-			}
-              }   
-     }
 	  
     stage("Deploy to Cloudhub"){
         	steps {
@@ -124,17 +57,6 @@ pipeline {
     }
 	   
       
-    stage("Kill container") {
-      		steps {
-        		script {
-	  	        	LAST_STARTED = env.STAGE_NAME		
-          		    	sh "docker rm -f jenkinsprojnew"
-				sh "sleep 10"
-				sh "docker rmi jenkinsprojnew:mule"
-				
-        		}
-      		}
-    	} 
    
    }
    post {
