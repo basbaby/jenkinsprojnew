@@ -123,15 +123,7 @@ pipeline {
              	}
     }
 	   
-    stage("Email") {
-      		steps {
-			script {
-          		    	readProps= readProperties file: "cucumber-API-Framework/email.properties"
-          		    	echo "${readProps["email.to"]}"
-        		    	emailext(subject: "$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!", body: "Build is Success.Please find the functional testing reports. In order to check the logs, please go to url: $BUILD_URL"+readFile("jenkinsprojnew/emailTemplate.html"), attachmentsPattern: "cucumber-API-Framework/target/cucumber-reports/report.html", from: "${readProps["email.from"]}", mimeType: "${readProps["email.mimeType"]}", to: "${readProps["email.to"]}")
-                        }
-		}
-    }   
+      
     stage("Kill container") {
       		steps {
         		script {
