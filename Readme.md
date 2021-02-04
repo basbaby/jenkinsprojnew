@@ -3,7 +3,7 @@
 2. Cucumber Framework
 3. REST Assured
 4. Extent Reports
-5. Java 8 (As some of the features of Anypoint Studio(deployment using maven) not compatible with higher versions.)
+5. Java 8 (As some of the features of Anypoint Studio(deployment u2sing maven) not compatible with higher versions.)
 
 **Prerequisites:**
 1. Anypoint Platform 7+ is installed on your machine.
